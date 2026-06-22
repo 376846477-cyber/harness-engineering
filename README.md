@@ -1,431 +1,255 @@
 ---
 name: harness-engineering
-description: Harness工程开发模式技能包 - 端到端的软件工程开发流程管理体系。包含设计、编码、测试、质量、部署全生命周期，集成CI/CD能力和代码-设计一致性验证。适用场景：(1) 新项目启动；(2) 功能开发；(3) 代码重构；(4) 质量提升。触发关键词：harness开发模式、工程化、软件开发流程、DevOps、CI/CD、质量门禁
+description: Harness工程化开发多Agent协作系统 - 端到端的软件工程开发流程管理体系。Harness Agent统筹调度6个子Agent（SA/Design/Coder/Review/Tester/CMO），覆盖需求分析→规格编写→架构设计→编码实现→一致性审查→质量验证→配置管理与发布全生命周期。适用场景：(1) 新项目启动；(2) 功能开发；(3) 代码重构；(4) 质量提升；(5) 部署发布。触发关键词：harness开发模式、工程化开发、多Agent协作、软件开发流程、DevOps、CI/CD、质量门禁、配置管理
 ---
 
-# Harness工程开发模式
+# Harness工程化开发 - 多Agent协作系统
 
 ## 概述
 
-Harness工程开发模式是一套完整的软件工程开发流程管理体系，覆盖从需求分析到生产部署的全生命周期。通过规范化的阶段流程、自动化工具集成和质量门禁机制，帮助开发团队提升代码质量和开发效率。
+Harness工程化开发是一套完整的多Agent协作软件工程开发体系，融合了**Harness工程开发模式**和**规范驱动开发(SDD)**的核心能力。通过Harness主Agent编排6个专业子Agent，实现从需求到交付的全链路闭环管理。
+
+## 系统架构
+
+```
+用户需求
+    │
+    ▼
+┌──────────┐
+│ Harness  │  主Agent（primary）- 统筹编排调度
+│  编排者   │
+└────┬─────┘
+     │ Task 工具调度
+     ├──▶ @sa-agent     → 需求理解 → 需求拆解 → PRD/Spec编写
+     ├──▶ @design-agent → 存量解析 → 组件规格 → 架构设计 → 接口设计 → 结构设计 → 流程设计
+     ├──▶ @coder-agent  → 阅读设计 → 编码实现
+      ├──▶ @review-agent → 阅读设计和代码 → 一致性检查 → 漏洞检测 → 架构合规 → 分层规范
+      ├──▶ @tester-agent → 测试用例生成 → 运行用例 → 修代码 → 检查
+      └──▶ @cmo-agent    → 入库前门禁 → 版本构建 → 发布部署 → 发布验证
+```
 
 ## 核心特性
 
 ### 1. 全生命周期管理
 ```
-需求分析 → 技术设计 → 代码实现 → 一致性验证 → 单元测试 → 质量检查 → 集成测试 → 部署发布
+需求分析 → 规格编写 → 架构设计 → 编码实现 → 一致性审查 → 质量验证 → 配置管理与发布 → 交付
 ```
 
-### 2. 质量左移
-- 在开发早期发现和修复问题
-- 自动化测试和质量门禁
-- 持续集成和持续交付
+### 2. 规范驱动开发(SDD)融合
+- Spec与Design严格分离："构建什么" vs "如何构建"
+- EARS格式验收条件
+- 需求→设计→代码→测试全链路可追溯
+
+### 3. 质量左移
+- 编码后自动触发一致性审查（Review Agent）
 - 代码-设计一致性验证
+- 安全漏洞检测和架构合规检查
 
-### 3. 可追溯性
-- 需求→设计→代码→测试的全链路追溯
-- 完整的变更历史和审计日志
-- 设计功能到代码行号的映射
+### 4. 闭环修复
+- Tester Agent发现问题时可直接修复代码
+- 修复后重新验证，确保问题解决
 
-## 技能包结构
+### 5. 人工审核模式选择
+支持两种运行模式，在流程开始时由用户选择：
+- **需要人工审核**：每个阶段出口门禁通过后暂停，等待用户确认后进入下一阶段（默认模式）
+- **无需人工审核**：仅执行系统门禁检查，各阶段自动流转（适用于自动化流水线或无人值守场景）
 
-```
-harness-skills/
-├── harness-dev-flow/              # 主流程编排器
-├── harness-design/                # 设计阶段
-├── harness-coding/                # 编码阶段
-├── harness-consistency-check/     # 代码-设计一致性验证
-├── harness-testing/               # 测试阶段
-├── harness-quality/               # 质量阶段
-├── harness-deploy/                # 部署阶段
-└── harness-integration/           # CI/CD集成
-```
+### 6. 固定技能加载
+每个Agent根据任务类型和项目语言，固定加载对应的技能：
+- **Coder**：根据语言加载编码规范技能（Python/Java/C++/C）
+- **Review**：根据语言加载代码质量技能（可读性、可维护性、安全性）
+- **Design**：根据设计阶段加载设计技能（架构设计、详细设计、接口设计）
+- **Tester**：加载测试验证技能（已整合测试用例生成）
 
-## 快速开始
+## Agent配置
 
-### 场景1：新功能开发
+| Agent | 角色 | 模式 | 职责 | Skill |
+|-------|------|------|------|-------|
+| harness-agent | Harness Agent | primary | 统筹编排调度子Agent | harness-orchestrator |
+| sa-agent | SA Agent（需求分析师） | subagent | 需求理解→拆解→PRD/Spec编写 | analyst-prd |
+| design-agent | Design Agent（设计工程师） | subagent | 存量解析→组件规格→架构设计→接口/结构/流程设计 | design-engineering |
+| coder-agent | Coder Agent（编码工程师） | subagent | 阅读设计→编码实现 | coding-skill |
+| review-agent | Review Agent（审查工程师） | subagent | 一致性检查→漏洞检测→架构合规→分层规范 | review-check |
+| tester-agent | Tester Agent（测试工程师） | subagent | 测试用例生成→运行用例→修代码→检查 | test-verify |
+| cmo-agent | CMO Agent（配置管理工程师） | subagent | 入库前门禁→版本构建→发布部署→发布验证 | config-management |
 
-```
-用户：我要开发一个用户认证功能
+## 工作流程
 
-AI：[触发harness-dev-flow]
-已启动Harness工程开发模式，开始用户认证功能开发流程：
+Harness Agent编排顺序：
 
-📋 阶段1：需求与设计
-1. 需求分析：用户认证功能需求
-2. 技术设计：认证架构设计
-3. 接口设计：认证API定义
+1. **需求分析** — Harness拆解需求，创建任务列表
+2. **PRD/Spec编写** — 调用 `@sa-agent`，产出 `docs/prd.md` + `.sd/specs/{feature}/spec.md`
+3. **系统设计** — 调用 `@design-agent`，产出 `docs/design.md` + `.sd/specs/{feature}/design.md` + `.sd/specs/{feature}/tasks.md`
+4. **编码实现** — 调用 `@coder-agent`，产出源代码和测试代码
+5. **一致性审查** — 调用 `@review-agent`，产出 `docs/review-report.md`
+6. **质量验证** — 调用 `@tester-agent`，产出 `docs/qa-report.md`（含代码修复）
+7. **配置管理与发布** — 调用 `@cmo-agent`，产出 `docs/deploy-report.md`（入库前门禁→版本构建→发布部署→发布验证）
+8. **交付汇总** — Harness汇总产出物，向用户报告
 
-[自动调用harness-design skill]
+## 产出物
 
-✏️ 阶段2：编码实现
-1. TDD开发：先写测试再写代码
-2. 功能实现：用户注册、登录、密码重置
-3. 单元测试：测试覆盖率目标80%+
-
-[自动调用harness-coding skill]
-
-✓ 阶段2.5：设计一致性验证
-1. 功能一致性检查
-2. 代码与设计对应
-3. 代码真实存在性验证
-
-[自动调用harness-consistency-check skill]
-
-🔬 阶段3：测试验证
-1. 单元测试执行
-2. 集成测试执行
-3. 覆盖率分析
-
-[自动调用harness-testing skill]
-
-🛡️ 阶段4：质量保证
-1. 代码规范检查
-2. 安全扫描
-3. 质量门禁验证
-
-[自动调用harness-quality skill]
-
-🚀 阶段5：构建部署
-1. 构建流水线
-2. 环境部署
-3. 发布验证
-
-[自动调用harness-deploy skill]
-
-✅ 开发完成！
-```
-
-### 场景2：代码质量检查
+完整流程执行后产出：
 
 ```
-用户：检查当前代码质量
+docs/
+├── prd.md              # 产品需求文档（sa-agent产出）
+├── design.md           # 技术设计文档（design-agent产出）
+├── review-report.md    # 一致性审查报告（review-agent产出）
+├── qa-report.md        # 质量验证报告（tester-agent产出）
+└── deploy-report.md    # 部署报告（cmo-agent产出）
 
-AI：[触发harness-quality]
-正在执行质量检查流程：
+.sd/
+└── specs/
+    └── {feature-name}/
+        ├── spec.md      # 需求规格（sa-agent产出）
+        ├── design.md    # 技术设计（design-agent产出）
+        └── tasks.md     # 实现任务（design-agent产出）
 
-✓ 代码规范检查
-✓ 静态分析
-✓ 安全扫描
-✓ 测试覆盖率分析
-
-质量报告已生成：
-- 代码评分: 85/100
-- 发现问题: 12个
-- 改进建议: 8条
+src/                    # 源代码（coder-agent产出）
+tests/                  # 测试代码（coder-agent产出）
 ```
-
-### 场景3：部署到生产环境
-
-```
-用户：部署到生产环境，使用金丝雀发布
-
-AI：[触发harness-deploy]
-正在执行金丝雀发布流程...
-
-阶段1：初始部署 (5%流量)
-阶段2：扩展部署 (25%流量)
-阶段3：半数部署 (50%流量)
-阶段4：全量部署 (100%流量)
-
-✅ 发布成功！
-```
-
-## 子技能详解
-
-### 1. harness-dev-flow（主流程编排器）
-
-**职责**：端到端的开发流程协调器，自动识别用户需求并调度子技能
-
-**触发关键词**：harness开发模式、开发流程、工程化、设计文档、代码开发、测试流程、质量检查、部署流程
-
-**核心能力**：
-- 自动阶段识别
-- 子技能调度
-- 流程编排
-- 产物管理
-
-### 2. harness-design（设计阶段）
-
-**职责**：管理软件工程的需求分析与技术设计阶段
-
-**触发关键词**：设计文档、技术设计、架构设计、需求分析、接口设计、数据库设计
-
-**核心能力**：
-- 需求分析与验收条件定义
-- 系统架构设计
-- API接口设计
-- 数据模型设计
-- 非功能设计
-
-**输出产物**：
-- 技术设计文档
-- 架构图
-- API接口定义
-- 数据模型图
-
-### 3. harness-coding（编码阶段）
-
-**职责**：管理代码实现和单元测试编写
-
-**触发关键词**：开始编码、实现功能、写代码、单元测试、代码规范、TDD
-
-**核心能力**：
-- 代码框架搭建
-- 核心功能实现
-- 单元测试编写
-- 代码评审
-- 设计一致性验证
-
-**输出产物**：
-- 源代码文件
-- 单元测试文件
-- 代码评审记录
-- 代码-设计一致性报告
-
-### 4. harness-consistency-check（一致性验证）
-
-**职责**：检查生成的代码是否与设计文档内容一致
-
-**触发关键词**：设计一致性、代码验证、一致性检查、设计对应
-
-**核心能力**：
-- 功能一致性检查
-- 代码与设计对应检查
-- 代码真实存在性检查
-- 设计功能到代码行号映射
-- 一致性报告生成
-
-**输出产物**：
-- 代码-设计一致性检查报告
-- 功能映射清单
-- 问题修复建议
-
-### 5. harness-testing（测试阶段）
-
-**职责**：管理软件测试流程和质量验证
-
-**触发关键词**：运行测试、测试报告、测试流程、覆盖率、集成测试、单元测试
-
-**核心能力**：
-- 单元测试执行
-- 集成测试执行
-- 测试覆盖率分析
-- 测试失败分析
-- 性能测试
-
-**输出产物**：
-- 测试报告
-- 覆盖率报告
-- 测试失败分析
-
-### 6. harness-quality（质量阶段）
-
-**职责**：管理代码质量检查和质量门禁
-
-**触发关键词**：质量检查、代码质量、质量门禁、静态分析、安全扫描
-
-**核心能力**：
-- 代码规范检查
-- 静态分析
-- 安全扫描
-- 性能分析
-- 质量门禁验证
-
-**输出产物**：
-- 质量报告
-- 问题清单
-- 改进建议
-
-### 7. harness-deploy（部署阶段）
-
-**职责**：管理应用构建和部署流程
-
-**触发关键词**：构建、部署、发布、流水线、CI/CD
-
-**核心能力**：
-- 构建流水线执行
-- 环境部署
-- 发布管理
-- 回滚机制
-- 监控告警
-
-**输出产物**：
-- 构建产物
-- 部署记录
-- 发布说明
-
-### 8. harness-integration（CI/CD集成）
-
-**职责**：在OpenCode中享受Harness的持续集成和持续交付能力
-
-**触发关键词**：质量检查、测试、部署、发布、流水线、harness、CI/CD、代码扫描
-
-**核心能力**：
-- 触发Harness流水线
-- 实时查看执行结果
-- AI辅助改进建议
-- 质量门禁管理
-
-**适用场景**：
-- 代码质量检查
-- 自动化测试
-- 构建部署
-- 质量门禁管理
 
 ## 安装部署
 
+### ⚠️ 重要：配置 model ID
+
+`opencode.json` 中的 `model` 字段默认值为 `"glm-5.1"`，**你必须将其替换为你自己 opencode 配置中实际使用的 model ID**。
+
+查看你的 model ID：打开 `~/.config/opencode/opencode.json`（全局配置），找到 `provider` 下你使用的模型名称，格式通常为 `provider名/model名`（如 `bailian-glm/glm-5.1`）或直接是 `model名`（如 `glm-5.1`）。
+
+将 `opencode.json` 中所有 7 个 agent 的 `model` 字段替换为你的实际 model ID。
+
 ### 方式一：项目级安装（推荐）
 
-**步骤**：
-
-1. 复制整个技能包到项目目录：
+1. 复制 `agents/` 目录到项目 `.opencode/agents/`：
    ```
-   你的项目/.opencode/skills/harness-engineering-flow/
-   └── harness-skills/ (包含所有子技能)
-   ```
-
-2. 配置项目设置：
-   在 `opencode.json` 中添加：
-   ```json
-   {
-     "skill": {
-       "harness-engineering-flow": {
-         "enabled": true,
-         "auto_trigger": true
-       }
-     }
-   }
+   你的项目/.opencode/agents/
+   ├── harness-agent.md
+   ├── sa-agent.md
+   ├── design-agent.md
+   ├── coder-agent.md
+   ├── review-agent.md
+   ├── tester-agent.md
+   └── cmo-agent.md
    ```
 
-3. 配置质量门禁（可选）：
-   创建 `.harness/config.yaml`：
-   ```yaml
-   harness:
-     workflow:
-       quality_gate: true
-       design_consistency_check: true
-     
-     quality:
-       code_coverage: 80
-       test_pass_rate: 95
-       security_level: high
-       design_consistency: 90
+2. 复制 `skills/` 目录到项目 `.opencode/skills/`：
    ```
+   你的项目/.opencode/skills/
+   ├── harness-orchestrator/SKILL.md
+   ├── analyst-prd/SKILL.md
+   ├── design-engineering/
+   │   ├── SKILL.md
+   │   ├── architecture-design/
+   │   ├── detailed-design/
+   │   └── interface-design/
+   ├── coding-skill/
+   │   ├── SKILL.md
+   │   ├── python/
+   │   ├── java/
+   │   ├── cpp/
+   │   └── c/
+   ├── review-check/SKILL.md
+   ├── test-verify/
+   │   ├── SKILL.md
+   │   ├── assets/
+   │   └── references/
+   ├── config-management/SKILL.md
+   └── templates/
+   ```
+
+3. 复制 `opencode.json` 到项目根目录，**并修改 model ID**
 
 ### 方式二：全局安装
 
-**步骤**：
+1. 复制 Agent 定义到全局目录：
+   - Windows: `%USERPROFILE%\.config\opencode\agents\`
+   - Linux/macOS: `~/.config/opencode/agents/`
 
-1. 复制到全局配置目录：
-   ```
-   Windows: %USERPROFILE%\.config\opencode\skills\harness-engineering-flow\
-   Linux/macOS: ~/.config/opencode/skills/harness-engineering-flow/
-   ```
+2. 复制 Skills 定义到全局目录：
+   - Windows: `%USERPROFILE%\.config\opencode\skills\`
+   - Linux/macOS: `~/.config/opencode/skills/`
 
-2. 全局配置：
-   在全局 `opencode.json` 中启用技能
+3. 将 `opencode.json` 中的 agent 配置合并到全局 `~/.config/opencode/opencode.json`，**并修改 model ID**
 
-## 质量标准
+### ⚠️ 注意事项
 
-### 代码质量指标
+- **permission 必须使用扁平格式**（如 `"bash": "allow"`），不要使用嵌套格式（如 `"bash": {"git *": "allow", "*": "ask"}`），OpenCode Desktop 不支持嵌套 permission，会导致子 Agent 启动失败
+- **agent md 文件只保留 description 和 system prompt**，不要在 frontmatter 中重复配置 model/permission/mode 等字段，这些由 opencode.json 统一控制
+- **model ID 必须与你的 provider 配置匹配**，否则子 Agent 无法连接 LLM
 
-| 指标 | 标准值 | 说明 |
-|------|--------|------|
-| 代码覆盖率 | ≥ 80% | 单元测试覆盖率 |
-| 测试通过率 | ≥ 95% | 所有测试通过率 |
-| 代码复杂度 | ≤ 10 | 单个函数圈复杂度 |
-| 重复代码率 | ≤ 5% | 代码重复率 |
-| 安全漏洞 | 0 | 高危安全漏洞数 |
-| 设计一致性 | ≥ 90% | 代码与设计一致率 |
+## 使用方式
 
-### 质量门禁规则
+### 启动Harness Agent
+在OpenCode中按 `Tab` 键切换到 `harness-agent` Agent
 
-```yaml
-quality_gates:
-  - name: 代码覆盖率
-    metric: code_coverage
-    threshold: 80
-    operator: ">="
-    
-  - name: 测试通过率
-    metric: test_pass_rate
-    threshold: 95
-    operator: ">="
-    
-  - name: 安全漏洞
-    metric: security_vulnerabilities
-    threshold: 0
-    operator: "=="
-    
-  - name: 设计一致性
-    metric: design_consistency
-    threshold: 90
-    operator: ">="
+### 直接使用子Agent
+```
+@sa-agent 帮我写一个用户登录功能的PRD
+@design-agent 分析当前项目代码结构并设计用户认证架构
+@coder-agent 实现用户登录接口
+@review-agent 检查代码与设计的一致性
+@tester-agent 运行测试并检查质量
+@cmo-agent 执行版本构建和部署发布
 ```
 
-## 使用建议
-
-### 1. 新项目启动
-使用完整的5阶段流程，从需求分析到部署发布
-
-### 2. 功能开发
-从设计阶段开始，编码后自动验证一致性
-
-### 3. 代码维护
-直接进入质量检查阶段，快速定位问题
-
-### 4. 问题修复
-从测试阶段开始验证，确保修复有效
-
-### 5. 设计变更
-更新设计文档后重新验证一致性
-
-## 最佳实践
-
-### 1. 测试驱动开发（TDD）
+### 触发完整流程
+向Harness提出需求：
 ```
-🔴 红灯 → 编写失败的测试
-🟢 绿灯 → 实现最小代码
-🔄 重构 → 优化代码质量
+我需要开发一个用户注册登录功能，支持手机号和邮箱两种注册方式
+```
+Harness自动编排所有子Agent完成全流程。
+
+### 可用技能列表
+
+#### 编码规范技能（支持Python/Java/C++/C）
+- **基础规范**：命名、格式、注释、异常处理、并发
+- **安全规范**：输入校验、加密安全、序列化安全
+- **Clean Code特征**：可读性、可维护性、可靠性、可测试性、性能、可移植性
+
+#### 设计技能
+- **design-engineering**：综合设计技能，整合架构设计、详细设计、接口设计
+  - `architecture-design/`：分层架构、模块划分、技术选型、依赖管理
+  - `detailed-design/`：数据库设计、业务流程设计、安全设计
+  - `interface-design/`：RESTful API设计、入参出参、错误码体系
+
+#### 测试技能
+- **test-verify**：质量验证，测试用例生成，修复代码问题，验证修复结果
+
+#### 配置管理技能
+- **config-management**：入库前门禁检查、版本构建、发布部署、发布验证
+
+### 技能加载示例
+```
+# Coder编码时自动加载编码规范技能
+@coder-agent 实现用户登录接口（Python项目）
+# 加载：coding-skill（自动检测项目语言并加载对应编码规范）
+
+# Review审查时自动加载代码质量技能
+@review-agent 检查用户登录接口代码
+# 加载：review-check（自动检测项目语言并加载对应代码质量规范）
+
+# Design设计时自动加载设计技能
+@design-agent 设计用户认证系统架构
+# 加载：design-engineering（整合所有设计子规范）
+
+# Tester测试时自动加载测试技能
+@tester-agent 生成用户登录功能的测试用例
+# 加载：test-verify（已整合测试用例生成功能）
+
+# CMO部署时自动加载配置管理技能
+@cmo-agent 构建版本并部署到生产环境
+# 加载：config-management（入库前门禁→版本构建→发布部署→发布验证）
 ```
 
-### 2. 持续集成
-- 代码提交自动触发CI流程
-- 代码检查 → 单元测试 → 质量门禁
-- 所有检查通过后才能合并
+## 模型配置建议
 
-### 3. 设计一致性保证
-- 编码完成后立即验证一致性
-- 功能模块完成后增量验证
-- 提交前必须通过一致性验证
-
-### 4. 质量左移
-- 在开发早期发现和修复问题
-- 自动化测试和质量门禁
-- 安全扫描和性能分析
-
-## 故障排查
-
-### 问题1：质量门禁不通过
-查看质量报告，根据AI建议修复问题
-
-### 问题2：测试失败
-运行测试失败分析，查看详细错误信息和修复建议
-
-### 问题3：设计一致性验证失败
-查看一致性报告，明确哪些功能缺失或不匹配
-
-### 问题4：部署失败
-查看部署日志，根据错误信息排查问题
-
-## 版本信息
-
-- **版本**: 1.1.0
-- **发布日期**: 2026-05-29
-- **更新内容**: 增加代码-设计一致性验证功能
-
----
-
-**维护者**: AI Assistant  
-**最后更新**: 2026-05-29
+| Agent | 推荐模型类型 | 原因 |
+|-------|-------------|------|
+| harness-agent | 强推理模型 | 需理解需求、编排任务 |
+| sa-agent | 强推理模型 | 需深度理解需求并结构化输出 |
+| design-agent | 强推理模型 | 需分析代码、设计架构、SDD流程 |
+| coder-agent | 代码能力强模型 | 需高质量代码输出 |
+| review-agent | 严谨模型 | 需细致审查、不遗漏问题 |
+| tester-agent | 代码+测试模型 | 需运行测试并修复代码 |
+| cmo-agent | 严谨模型 | 需细致检查配置、构建、部署步骤 |
