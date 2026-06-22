@@ -1,0 +1,144 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "default_agent": "harness-agent",
+  "agent": {
+    "harness-agent": {
+      "description": "Harness Agent，负责需求拆解、工作流编排、调度6个子Agent协同工作",
+      "mode": "primary",
+      "model": "glm-5.1",
+      "temperature": 0.3,
+      "steps": 50,
+      "color": "#4A90D9",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "todowrite": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "question": "allow"
+      }
+    },
+    "sa-agent": {
+      "description": "SA Agent（需求分析师），负责需求理解、需求拆解、PRD编写和SDD规格文档编写",
+      "mode": "subagent",
+      "model": "glm-5.1",
+      "temperature": 0.4,
+      "steps": 30,
+      "color": "#7B68EE",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "todowrite": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "question": "allow"
+      }
+    },
+    "design-agent": {
+      "description": "Design Agent（设计工程师），负责存量代码解析、组件规格定义、架构设计、接口设计、结构设计、流程设计",
+      "mode": "subagent",
+      "model": "glm-5.1",
+      "temperature": 0.2,
+      "steps": 50,
+      "color": "#FF8C00",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "todowrite": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "question": "allow"
+      }
+    },
+    "coder-agent": {
+      "description": "Coder Agent（编码工程师），负责根据系统设计文档进行编码实现、配置管理，完成功能开发交付",
+      "mode": "subagent",
+      "model": "glm-5.1",
+      "temperature": 0.1,
+      "steps": 60,
+      "color": "#32CD32",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "todowrite": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "question": "allow"
+      }
+    },
+    "review-agent": {
+      "description": "Review Agent（审查工程师），负责代码-设计一致性检查、安全漏洞检测、架构合规审查、分层规范检查",
+      "mode": "subagent",
+      "model": "glm-5.1",
+      "temperature": 0.1,
+      "steps": 40,
+      "color": "#FF6347",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "todowrite": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "question": "allow"
+      }
+    },
+    "tester-agent": {
+      "description": "Tester Agent（测试工程师），负责测试用例生成、运行测试用例、修复代码问题、验证修复结果",
+      "mode": "subagent",
+      "model": "glm-5.1",
+      "temperature": 0.1,
+      "steps": 50,
+      "color": "#DC143C",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "todowrite": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "question": "allow"
+      }
+    },
+    "cmo-agent": {
+      "description": "CMO Agent（配置管理工程师），负责入库前门禁、版本构建、发布部署，确保代码能稳定交付到目标环境",
+      "mode": "subagent",
+      "model": "glm-5.1",
+      "temperature": 0.1,
+      "steps": 40,
+      "color": "#8B4513",
+      "permission": {
+        "edit": "allow",
+        "bash": "allow",
+        "read": "allow",
+        "glob": "allow",
+        "grep": "allow",
+        "todowrite": "allow",
+        "task": "allow",
+        "skill": "allow",
+        "question": "allow"
+      }
+    }
+  },
+  "permission": {
+    "skill": {
+      "*": "allow"
+    }
+  }
+}
